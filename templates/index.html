@@ -329,8 +329,13 @@
 
         @media (max-width: 768px) {
             .floating-bmc {
-                display: none;
-                /* Hide on smaller screens to prevent obstruction */
+                top: auto;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            body {
+                padding-bottom: 60px;
             }
         }
     </style>
