@@ -37,7 +37,7 @@ Join our Telegram group for support, discussion, and to use the bot.
 ### 🍻 Support the Project
 If you find this tool helpful, consider buying me a beer! Your support keeps the updates coming.
 
-<a href="https://www.buymeacoffee.com/bartixxx32"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=bartixxx32&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff" /></a>
+[![Buy Me A Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20beer&emoji=%F0%9F%8D%BA&slug=bartixxx32&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/bartixxx32)
 
 ## 📊 Current Status
 
@@ -1165,4 +1165,4 @@ This API helps you get direct, signed download URLs for OnePlus OTA firmware fil
 - **API for CN variants**: [roms.danielspringer.at](https://roms.danielspringer.at/) by Daniel Springer
 
 ---
-*Last updated: 2026-03-04 05:43 UTC*
+*Last updated: 2026-03-04 05:48 UTC*
