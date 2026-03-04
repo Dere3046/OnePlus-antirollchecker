@@ -3,7 +3,8 @@ import os
 import json
 import time
 import aiohttp
-import html
+import html as html_mod
+from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import datetime, timezone
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
@@ -168,15 +169,19 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
         "🤖 *OnePlus ARB Checker Bot*\n\n"
         "*Available Commands:*\n\n"
-        "🔍 /check `https://...` — Analyze a firmware file\n"
+        "🔍 /check `<url>` — Analyze a firmware file\n"
         "   _Send a direct download link to a OnePlus firmware .zip_\n\n"
+        "📥 /download `<device>` `[region]` — Fetch latest firmware & auto-check ARB\n"
+        "   _Example: /download OnePlus 15 EU_\n\n"
+        "📱 /devicestatus `<device>` — Show current firmware & ARB info\n"
+        "   _Example: /devicestatus OnePlus 12_\n\n"
+        "🔥 /latest — Show the 5 most recently discovered firmwares\n\n"
         "ℹ️ /about — Bot info, version & uptime\n"
         "❓ /help — Show this message\n\n"
-        "*How it works:*\n"
-        "1. Send /check with a firmware URL\n"
-        "2. Bot triggers analysis via GitHub Actions\n"
-        "3. Status updates appear in real-time\n"
-        "4. Results are posted as a reply\n\n"
+        "*How /download works:*\n"
+        "1. Bot resolves device name → fetches firmware URL from API\n"
+        "2. Triggers ARB analysis via GitHub Actions\n"
+        "3. Posts download link + ARB results as replies\n\n"
         "📋 _Rate limit: 2 checks per minute_"
     )
     await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=get_main_keyboard())
@@ -324,16 +329,341 @@ async def latest(update: Update, context: ContextTypes.DEFAULT_TYPE, is_callback
     else:
         await update.message.reply_text(text, parse_mode="Markdown")
 
+# --- Device Resolution Helpers ---
+# Device metadata mappings (embedded from config.py for bot autonomy)
+DEVICE_METADATA = {
+    "15": {"name": "OnePlus 15", "models": {"GLO": "CPH2747", "EU": "CPH2747", "IN": "CPH2745", "CN": "PLK110"}},
+    "15R": {"name": "OnePlus 15R", "models": {"GLO": "CPH2769", "EU": "CPH2769", "IN": "CPH2767"}},
+    "13": {"name": "OnePlus 13", "models": {"GLO": "CPH2653", "EU": "CPH2653", "IN": "CPH2649", "NA": "CPH2655", "CN": "PJZ110"}},
+    "13R": {"name": "OnePlus 13R", "models": {"GLO": "CPH2645", "EU": "CPH2645", "IN": "CPH2691"}},
+    "12": {"name": "OnePlus 12", "models": {"GLO": "CPH2581", "EU": "CPH2581", "IN": "CPH2573", "NA": "CPH2583", "CN": "PJD110"}},
+    "12R": {"name": "OnePlus 12R", "models": {"GLO": "CPH2609", "EU": "CPH2609", "IN": "CPH2585", "NA": "CPH2611"}},
+    "11": {"name": "OnePlus 11", "models": {"GLO": "CPH2449", "EU": "CPH2449", "IN": "CPH2447", "NA": "CPH2451"}},
+    "11R": {"name": "OnePlus 11R", "models": {"IN": "CPH2487"}},
+    "10 Pro": {"name": "OnePlus 10 Pro", "models": {"GLO": "NE2213", "EU": "NE2213", "IN": "NE2211", "NA": "NE2215", "CN": "NE2210"}},
+    "10T": {"name": "OnePlus 10T", "models": {"GLO": "CPH2415", "EU": "CPH2415", "IN": "CPH2413", "NA": "CPH2417"}},
+    "9 Pro": {"name": "OnePlus 9 Pro", "models": {"NA": "LE2125", "EU": "LE2123", "IN": "LE2121"}},
+    "9": {"name": "OnePlus 9", "models": {"NA": "LE2115", "EU": "LE2113", "IN": "LE2111"}},
+    "Open": {"name": "OnePlus Open", "models": {"EU": "CPH2551", "IN": "CPH2551", "NA": "CPH2551"}},
+    "Nord 5": {"name": "OnePlus Nord 5", "models": {"GLO": "CPH2709", "EU": "CPH2709", "IN": "CPH2707"}},
+    "Nord 4": {"name": "OnePlus Nord 4", "models": {"GLO": "CPH2663", "EU": "CPH2663", "IN": "CPH2661"}},
+    "Ace 6T": {"name": "OnePlus Ace 6T", "models": {"CN": "PLR110"}},
+    "Ace 6": {"name": "OnePlus Ace 6", "models": {"CN": "PLQ110"}},
+    "Ace 5 Pro": {"name": "OnePlus Ace 5 Pro", "models": {"CN": "PKR110"}},
+    "Ace 5": {"name": "OnePlus Ace 5", "models": {"CN": "PKG110"}},
+    "Ace 3 Pro": {"name": "OnePlus Ace 3 Pro", "models": {"CN": "PJX110"}},
+    "Ace 3V": {"name": "OnePlus Ace 3V", "models": {"CN": "PJF110"}},
+    "Ace 3": {"name": "OnePlus Ace 3", "models": {"CN": "PJE110"}},
+    "Pad 3": {"name": "OnePlus Pad 3", "models": {"GLO": "OPD2415", "EU": "OPD2415"}},
+    "Pad 2 Pro": {"name": "OnePlus Pad 2 Pro", "models": {"CN": "OPD2413"}},
+    "Pad 2": {"name": "OnePlus Pad 2", "models": {"GLO": "OPD2403", "EU": "OPD2403", "IN": "OPD2403"}},
+}
+
+OOS_MAPPING = {
+    "15": "oneplus_15", "15R": "oneplus_15r",
+    "13": "oneplus_13", "13R": "oneplus_13r",
+    "12": "oneplus_12", "12R": "oneplus_12r",
+    "11": "oneplus_11", "11R": "oneplus_11r",
+    "10 Pro": "oneplus_10_pro", "10T": "oneplus_10t",
+    "9 Pro": "oneplus_9_pro", "9": "oneplus_9",
+    "Open": "oneplus_open",
+    "Nord 5": "oneplus_nord_5", "Nord 4": "oneplus_nord_4",
+    "Ace 6T": "oneplus_ace_6t", "Ace 6": "oneplus_ace_6",
+    "Ace 5": "oneplus_ace_5", "Ace 5 Pro": "oneplus_ace_5_pro",
+    "Ace 3 Pro": "oneplus_ace_3_pro", "Ace 3V": "oneplus_ace_3v", "Ace 3": "oneplus_ace_3",
+    "Pad 3": "oneplus_pad_3", "Pad 2": "oneplus_pad_2", "Pad 2 Pro": "oneplus_pad2_pro",
+}
+
+# Springer API (roms.danielspringer.at) for CN variants
+SPRINGER_API_URL = "https://roms.danielspringer.at/index.php?view=ota"
+SPRING_MAPPING = {
+    "oneplus_15": "OP 15", "oneplus_15r": "OP 15R",
+    "oneplus_13": "OP 13", "oneplus_13r": "OP 13R",
+    "oneplus_12": "OP 12", "oneplus_12r": "OP ACE 3",
+    "oneplus_11": "OP 11", "oneplus_11r": "OP 11R",
+    "oneplus_10_pro": "OP 10 PRO",
+    "oneplus_ace_6t": "OP ACE 6T", "oneplus_ace_6": "OP ACE 6",
+    "oneplus_ace_5": "OP ACE 5", "oneplus_ace_5_pro": "OP ACE 5 PRO",
+    "oneplus_ace_3_pro": "OP ACE 3 PRO", "oneplus_ace_3v": "OP ACE 3V", "oneplus_ace_3": "OP ACE 3",
+    "oneplus_pad2_pro": "OP PAD2 PRO", "oneplus_pad_3": "OP PAD3", "oneplus_pad_2": "OP PAD2",
+    "oneplus_open": "OP OPEN",
+    "oneplus_nord_5": "OP NORD 5", "oneplus_nord_4": "OP NORD 4",
+}
+
+OOS_API_BASE = "https://oosdownloader-gui.fly.dev/api"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
+def resolve_device(query: str):
+    """Resolve a user query (name, model number, or short ID) to a device_id and region."""
+    query_lower = query.lower().strip()
+    
+    # Try to extract region suffix (e.g., "oneplus 15 eu")
+    parts = query_lower.rsplit(" ", 1)
+    region_hint = None
+    search_query = query_lower
+    known_regions = {"glo", "eu", "in", "na", "cn", "visible"}
+    if len(parts) > 1 and parts[-1].upper() in {r.upper() for r in known_regions}:
+        region_hint = parts[-1].upper()
+        search_query = parts[0].strip()
+    
+    # 1. Try direct device_id match (e.g., "15", "13R", "Nord 4")
+    for did, meta in DEVICE_METADATA.items():
+        if search_query == did.lower():
+            region = region_hint or next((r for r in ["GLO", "EU", "IN", "NA", "CN"] if r in meta["models"]), None)
+            return did, meta["name"], region
+    
+    # 2. Try device name match (e.g., "oneplus 15", "oneplus nord 4")
+    for did, meta in DEVICE_METADATA.items():
+        if search_query in meta["name"].lower() or meta["name"].lower() in search_query:
+            region = region_hint or next((r for r in ["GLO", "EU", "IN", "NA", "CN"] if r in meta["models"]), None)
+            return did, meta["name"], region
+    
+    # 3. Try model number match (e.g., "CPH2747")
+    for did, meta in DEVICE_METADATA.items():
+        for reg, model in meta["models"].items():
+            if search_query == model.lower():
+                region = region_hint or reg
+                return did, meta["name"], region
+    
+    return None, None, None
+
+async def fetch_firmware_oos(device_id: str, region: str) -> dict:
+    """Fetch the latest firmware download URL from OOS API."""
+    mapped_id = OOS_MAPPING.get(device_id, f"oneplus_{device_id.lower().replace(' ', '_')}")
+    brand = "oneplus"
+    url = f"{OOS_API_BASE}/{brand}/{mapped_id}/{region}/full/info"
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                if resp.status != 200:
+                    return None
+                data = await resp.json()
+                if "download_url" in data and data["download_url"]:
+                    return {
+                        "url": data["download_url"],
+                        "version": data.get("version_number", "Unknown"),
+                        "md5": data.get("md5sum")
+                    }
+    except Exception as e:
+        logging.error(f"OOS API error: {e}")
+    return None
+
+async def fetch_firmware_springer(device_id: str, region: str) -> dict:
+    """Fetch firmware download URL from Springer API (roms.danielspringer.at). Used for CN."""
+    mapped_id = OOS_MAPPING.get(device_id, f"oneplus_{device_id.lower().replace(' ', '_')}")
+    springer_name = SPRING_MAPPING.get(mapped_id)
+    if not springer_name:
+        return None
+    
+    headers = {"User-Agent": USER_AGENT}
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            # Step 1: GET the page to find available versions
+            async with session.get(SPRINGER_API_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=20)) as resp:
+                if resp.status != 200:
+                    return None
+                page_html = await resp.text()
+            
+            soup = BeautifulSoup(page_html, 'html.parser')
+            device_select = soup.find('select', {'id': 'device'})
+            if not device_select:
+                return None
+            
+            devices_json = device_select.get('data-devices')
+            if not devices_json:
+                return None
+            
+            devices_data = json.loads(html_mod.unescape(devices_json))
+            
+            # Resolve device name (fuzzy match)
+            device_name = springer_name
+            if device_name not in devices_data:
+                found = False
+                for d in devices_data:
+                    if device_name.upper() == d.upper() or d.upper().startswith(device_name.upper() + " "):
+                        device_name = d
+                        found = True
+                        break
+                if not found:
+                    return None
+            
+            if region not in devices_data[device_name]:
+                return None
+            
+            versions = devices_data[device_name][region]
+            if not versions:
+                return None
+            
+            found_version_name = versions[0]  # Latest version is first
+            
+            # Step 2: POST form to get signed URL
+            form_data = {
+                'device': device_name,
+                'region': region,
+                'version_index': '0',
+            }
+            post_headers = {
+                'User-Agent': USER_AGENT,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Referer': SPRINGER_API_URL,
+            }
+            
+            async with session.post(SPRINGER_API_URL, data=form_data, headers=post_headers, timeout=aiohttp.ClientTimeout(total=20)) as resp:
+                if resp.status != 200:
+                    return None
+                result_html = await resp.text()
+            
+            soup = BeautifulSoup(result_html, 'html.parser')
+            result_div = soup.find('div', {'id': 'resultBox'})
+            
+            if result_div and result_div.get('data-url'):
+                download_url = html_mod.unescape(result_div.get('data-url'))
+                return {
+                    "url": download_url,
+                    "version": found_version_name,
+                    "md5": None
+                }
+    except Exception as e:
+        logging.error(f"Springer API error: {e}")
+    return None
+
+async def fetch_firmware_url(device_id: str, region: str) -> dict:
+    """Try OOS API first, then fall back to Springer API."""
+    # For CN, skip OOS and go straight to Springer
+    if region != "CN":
+        result = await fetch_firmware_oos(device_id, region)
+        if result:
+            return result
+    
+    # Fallback to Springer (works for CN and as backup for others)
+    result = await fetch_firmware_springer(device_id, region)
+    if result:
+        return result
+    
+    # If CN failed on Springer, try OOS as last resort
+    if region == "CN":
+        result = await fetch_firmware_oos(device_id, region)
+        if result:
+            return result
+    
+    return None
+
 async def download_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE, is_callback=False):
-    text = (
-        "📥 **Download OnePlus Firmwares**\n\n"
-        "To find direct download links for your device, check our main website index:\n"
-        "👉 [OnePlus ARB Checker](https://oneplusantiroll.netlify.app/)"
-    )
+    """Fetch the latest firmware for a device and trigger an ARB check."""
+    ALLOWED_GROUP_ID = -1003662409203
+    
     if is_callback:
-        await update.callback_query.message.reply_text(text, parse_mode="Markdown", disable_web_page_preview=True)
+        msg_target = update.callback_query.message
     else:
-        await update.message.reply_text(text, parse_mode="Markdown", disable_web_page_preview=True)
+        msg_target = update.message
+    
+    chat_id = update.effective_chat.id
+    user = update.effective_user
+    user_mention = f"@{user.username}" if user.username else user.first_name
+    
+    if not context.args and not is_callback:
+        await msg_target.reply_text(
+            "📥 **Download & Check Firmware**\n\n"
+            "Usage: `/download <device> [region]`\n"
+            "Example: `/download OnePlus 15 EU`\n\n"
+            "This will fetch the latest firmware and automatically run an ARB check!",
+            parse_mode="Markdown"
+        )
+        return
+    
+    if is_callback:
+        await msg_target.reply_text(
+            "📥 **Download & Check Firmware**\n\n"
+            "Usage: `/download <device> [region]`\n"
+            "Example: `/download OnePlus 15 EU`\n\n"
+            "This will fetch the latest firmware and automatically run an ARB check!",
+            parse_mode="Markdown"
+        )
+        return
+    
+    query = " ".join(context.args)
+    device_id, device_name, region = resolve_device(query)
+    
+    if not device_id:
+        await msg_target.reply_text(f"❌ Device not found: `{query}`\n\nTry: `/download OnePlus 15` or `/download CPH2747`", parse_mode="Markdown")
+        return
+    
+    if not region:
+        await msg_target.reply_text(f"❌ No region found for {device_name}. Try: `/download {device_name} EU`", parse_mode="Markdown")
+        return
+    
+    # Send a status message
+    status_msg = await msg_target.reply_text(
+        f"🔍 Fetching latest firmware for **{device_name}** ({region})...",
+        parse_mode="Markdown"
+    )
+    
+    # Fetch firmware URL from OOS API
+    firmware = await fetch_firmware_url(device_id, region)
+    
+    if not firmware:
+        await status_msg.edit_text(
+            f"❌ Could not fetch firmware for **{device_name}** ({region}).\n"
+            f"The OOS API may not have this device/region.\n\n"
+            f"💡 Try manually: [OOS Downloader](https://oosdownloader-gui.fly.dev/)",
+            parse_mode="Markdown",
+            disable_web_page_preview=True
+        )
+        return
+    
+    fw_url = firmware["url"]
+    fw_version = firmware["version"]
+    
+    await status_msg.edit_text(
+        f"✅ Found firmware for **{device_name}** ({region})\n"
+        f"📦 Version: `{fw_version}`\n"
+        f"🚀 Triggering ARB check...",
+        parse_mode="Markdown"
+    )
+    
+    # Trigger GitHub Actions workflow (same as /check)
+    message_id = update.message.message_id
+    message_thread_id = update.effective_message.message_thread_id
+    request_chat_id = str(chat_id)
+    if message_thread_id:
+        request_chat_id = f"{chat_id}_{message_thread_id}"
+    
+    record_check(user.id, user_mention)
+    success = await trigger_github_workflow(fw_url, request_chat_id, message_id, user_mention, status_msg.message_id)
+    
+    if success:
+        await status_msg.edit_text(
+            f"✅ ARB check started for **{device_name}** ({region})\n"
+            f"📦 Version: `{fw_version}`\n"
+            f"⏳ Waiting for GitHub Actions runner...",
+            parse_mode="Markdown"
+        )
+        # Send a separate message with the download link (won't be deleted by workflow)
+        message_thread_id = update.effective_message.message_thread_id
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"📥 **Direct firmware download link:**\n[{device_name} ({region}) - {fw_version}]({fw_url})",
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+            message_thread_id=message_thread_id
+        )
+    else:
+        record_error()
+        await status_msg.edit_text(
+            f"❌ Failed to trigger ARB check for **{device_name}**.\n"
+            f"You can try `/check` manually.",
+            parse_mode="Markdown"
+        )
+        message_thread_id = update.effective_message.message_thread_id
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"📥 **Direct firmware download link:**\n[{device_name} ({region}) - {fw_version}]({fw_url})",
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+            message_thread_id=message_thread_id
+        )
 
 async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
