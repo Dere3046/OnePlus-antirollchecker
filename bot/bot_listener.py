@@ -258,7 +258,7 @@ async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logging.error(f"Failed to delete message: {e}")
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"{user_mention}, ❌ Invalid URL format. Please provide a valid Direct Download Link starting with http:// or https://"
+            text=f"{user_mention}, ❌ Invalid URL format.\nUsage: /check https://example.com/firmware.zip"
         )
         return
 
