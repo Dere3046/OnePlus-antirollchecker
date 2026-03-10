@@ -252,6 +252,14 @@ If you find this tool helpful, consider buying me a beer! Your support keeps the
 
 ---
 
+### OnePlus 13T
+
+| Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
+|:---|:---|:---|:---|:---|:---|:---|
+| China | PKX110 | PKX110_16.0.3.502(CN01) | **1** | Major: 3, Minor: 0 | 2026-03-10 | ❌ |
+
+---
+
 ### OnePlus Open
 
 | Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
@@ -741,6 +749,42 @@ If you find this tool helpful, consider buying me a beer! Your support keeps the
 
 ---
 
+### OnePlus Nord CE 3 Lite
+
+| Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
+|:---|:---|:---|:---|:---|:---|:---|
+| Global | CPH2465 | CPH2465_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>72d0c27bdc608978592e04cdce62b016</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| Europe | CPH2465EEA | CPH2465_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>b08db09891b432a2ef4648888803668a</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| India | CPH2467 | CPH2467_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>479a7a4ead369db901314969f4728b37</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+
+---
+
+### OnePlus Nord CE 2 Lite
+
+| Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
+|:---|:---|:---|:---|:---|:---|:---|
+| Global | CPH2409 | CPH2409_14.0.0.2700(EX01)<br><details><summary>MD5</summary><code>b101fe4ea22334155ed14c766bb8d1ab</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| Europe | CPH2409EEA | CPH2409_14.0.0.2700(EX01)<br><details><summary>MD5</summary><code>4b628f389081f069651aaf8663ce1355</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| India | CPH2381 | CPH2381_14.0.0.2700(EX01)<br><details><summary>MD5</summary><code>99fec841bb7c8abb22a11dd88b8bd73e</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+
+---
+
+### OnePlus Nord N30
+
+| Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
+|:---|:---|:---|:---|:---|:---|:---|
+| NA | CPH2513 | CPH2513_11_C.62<br><details><summary>MD5</summary><code>0aee1de71ddf7ea9251b46d0bce01fdd</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+
+---
+
+### OnePlus Nord N20
+
+| Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
+|:---|:---|:---|:---|:---|:---|:---|
+| NA | CPH2459 | CPH2459_11_C.24<br><details><summary>MD5</summary><code>b2dac2cc86b0f5315ce9f5ff861ac6cb</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+
+---
+
 ### OnePlus Nord
 
 | Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
@@ -985,6 +1029,26 @@ If you find this tool helpful, consider buying me a beer! Your support keeps the
 
 ---
 
+### Oppo Reno10 Pro
+
+| Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
+|:---|:---|:---|:---|:---|:---|:---|
+| SG | CPH2525SG | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>3835050ceee6140cf06affe9cf7db263</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| TW | CPH2525TW | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>d3aeff26f756d3b5e7e85de67999662c</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| MY | CPH2525MY | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>0da7796177735bd736ae027aad6ffbde</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| ID | CPH2525ID | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>b502f539b8bc91a414018a5eebd68250</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| TH | CPH2525TH | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>b72448e68f81b4efb446f67570935915</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| VN | CPH2525VN | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>945e55b6759b3147e2661e0db1cdb0a3</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| APC | CPH2525 | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>7ffcae1c7860325a9db9ebd846c9f072</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| OCA | CPH2525OCA | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>6554872f0d665c9a77cefb972287a7e5</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| SA | CPH2525SA | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>c1f95a3c9caae0d0a89c62e9d6589fea</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| EEA | CPH2525EEA | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>5331936b839bd4267088fa89b461d060</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| India | CPH2525IN | CPH2525_13.1.1.147(EX01)<br><details><summary>MD5</summary><code>abb2a1ef3450621de3073f48d5215b19</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| PH | CPH2525PH | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>1f6e08b4926652d580b2fce0839b95f4</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+| MEA | CPH2525MEA | CPH2525_15.0.0.1600(EX01)<br><details><summary>MD5</summary><code>d75e6df459ee8ed050e99e143a9ffe1c</code></details> | **0** | Major: 0, Minor: 120 | 2026-03-10 | ✅ |
+
+---
+
 ### Oppo Find X8 Ultra
 
 | Region | Model | Firmware Version | ARB Index | OEM Version | Last Checked | Safe |
@@ -1186,4 +1250,4 @@ Prefer a native mobile experience? We have an official Android app on F-Droid! C
 > **Important:** The bot **only** works within this group to prevent spam and ensure availability. DM checks are disabled.
 
 ---
-*Last updated: 2026-03-10 02:35 UTC*
+*Last updated: 2026-03-10 06:06 UTC*

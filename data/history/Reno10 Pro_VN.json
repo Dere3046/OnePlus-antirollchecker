@@ -1,0 +1,18 @@
+{
+  "history": [
+    {
+      "version": "CPH2525_15.0.0.1600(EX01)",
+      "arb": 0,
+      "major": 0,
+      "minor": 120,
+      "first_seen": "2026-03-10",
+      "last_checked": "2026-03-10",
+      "status": "current",
+      "md5": "945e55b6759b3147e2661e0db1cdb0a3"
+    }
+  ],
+  "device": "Oppo Reno10 Pro",
+  "device_id": "Reno10 Pro",
+  "region": "VN",
+  "model": "CPH2525VN"
+}

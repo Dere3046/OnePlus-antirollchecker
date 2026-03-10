@@ -1,0 +1,17 @@
+{
+  "history": [
+    {
+      "version": "PKX110_16.0.3.502(CN01)",
+      "arb": 1,
+      "major": 3,
+      "minor": 0,
+      "first_seen": "2026-03-10",
+      "last_checked": "2026-03-10",
+      "status": "current"
+    }
+  ],
+  "device": "OnePlus 13T",
+  "device_id": "13T",
+  "region": "CN",
+  "model": "PKX110"
+}
