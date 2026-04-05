@@ -113,12 +113,17 @@ jobs:
         run: |
           pip install -r requirements.txt
           mkdir -p tools
-          curl -L -o tools/arbextract https://github.com/koaaN/arbextract/releases/download/1.0/arbextract-x86_64-linux
-          chmod +x tools/arbextract
+          # Setup arb_inspector
+          curl -L -o arb_inspector.zip https://github.com/Dere3046/arb_inspector_next/releases/download/v0.3.0_noAndroid/arb_inspector_linux_x86_64.zip
+          unzip arb_inspector.zip
+          mv arb_inspector tools/arb_inspector
+          chmod +x tools/arb_inspector
+          # Setup otaripper
           curl -L -o otaripper.tar.gz https://github.com/syedinsaf/otaripper/releases/download/v2.1.1/otaripper-2.1.1-linux-static-x86_64.tar.gz
           tar -xzvf otaripper.tar.gz
           mv otaripper tools/otaripper || find . -name "otaripper" -type f -exec mv {} tools/otaripper \;
           chmod +x tools/otaripper
+          # Setup payload-dumper-go (Fallback)
           curl -L -o pdg.tar.gz https://github.com/ssut/payload-dumper-go/releases/download/1.2.2/payload-dumper-go_1.2.2_linux_amd64.tar.gz
           tar -xzvf pdg.tar.gz
           mv payload-dumper-go tools/payload-dumper-go || find . -name "payload-dumper-go" -type f -exec mv {} tools/payload-dumper-go \;

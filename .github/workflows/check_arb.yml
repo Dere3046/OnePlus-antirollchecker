@@ -70,12 +70,17 @@ jobs:
         if: steps.cache-tools.outputs.cache-hit != 'true'
         run: |
           mkdir -p tools
-          curl -L -o tools/arbextract https://github.com/koaaN/arbextract/releases/download/1.0/arbextract-x86_64-linux
-          chmod +x tools/arbextract
+          # Setup arb_inspector
+          curl -L -o arb_inspector.zip https://github.com/Dere3046/arb_inspector_next/releases/download/v0.3.0_noAndroid/arb_inspector_linux_x86_64.zip
+          unzip arb_inspector.zip
+          mv arb_inspector tools/arb_inspector
+          chmod +x tools/arb_inspector
+          # Setup otaripper
           curl -L -o otaripper.tar.gz https://github.com/syedinsaf/otaripper/releases/download/v2.1.1/otaripper-2.1.1-linux-static-x86_64.tar.gz
           tar -xzvf otaripper.tar.gz
           mv otaripper tools/otaripper || find . -name "otaripper" -type f -exec mv {} tools/otaripper \;
           chmod +x tools/otaripper
+          # Setup payload-dumper-go (Fallback)
           curl -L -o pdg.tar.gz https://github.com/ssut/payload-dumper-go/releases/download/1.2.2/payload-dumper-go_1.2.2_linux_amd64.tar.gz
           tar -xzvf pdg.tar.gz
           mv payload-dumper-go tools/payload-dumper-go || find . -name "payload-dumper-go" -type f -exec mv {} tools/payload-dumper-go \;
@@ -254,16 +259,24 @@ jobs:
         if: steps.cache-arb.outputs.cache-hit == 'true' && hashFiles('firmware_data/xbl_config.img') != ''
         run: |
           echo "Cache hit! Extracting ARB from cached xbl_config.img..."
-          
-          # Run arbextract and capture output
-          ARB_OUTPUT=$(tools/arbextract firmware_data/xbl_config.img)
+
+          # Run arb_inspector and capture output
+          ARB_OUTPUT=$(tools/arb_inspector --full firmware_data/xbl_config.img)
           echo "$ARB_OUTPUT"
-          
+
           # Parse the output and create JSON
-          ARB_INDEX=$(echo "$ARB_OUTPUT" | grep "ARB (Anti-Rollback)" | awk -F':' '{print $2}' | tr -d ' ')
-          MAJOR=$(echo "$ARB_OUTPUT" | grep "Major Version" | awk -F':' '{print $2}' | tr -d ' ')
-          MINOR=$(echo "$ARB_OUTPUT" | grep "Minor Version" | awk -F':' '{print $2}' | tr -d ' ')
+          ARB_INDEX=$(echo "$ARB_OUTPUT" | grep "Anti-Rollback Version:" | awk -F':' '{print $2}' | tr -d ' ')
+          OEM_VERSION=$(echo "$ARB_OUTPUT" | grep "  Version:" | head -1 | awk -F':' '{print $2}' | tr -d ' ')
           
+          # Parse major.minor from version string like "2.0"
+          if [ -n "$OEM_VERSION" ] && echo "$OEM_VERSION" | grep -q '\.'; then
+            MAJOR=$(echo "$OEM_VERSION" | cut -d'.' -f1)
+            MINOR=$(echo "$OEM_VERSION" | cut -d'.' -f2)
+          else
+            MAJOR="0"
+            MINOR="0"
+          fi
+
           # Create result.json
           cat > result.json << EOF
           {
@@ -272,7 +285,7 @@ jobs:
             "minor": "$MINOR"
           }
           EOF
-          
+
           cat result.json
 
       - name: Update JSON History (Current Version)

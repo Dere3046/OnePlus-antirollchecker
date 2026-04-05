@@ -1629,7 +1629,7 @@ Our OOS Downloader API provides direct, signed download URLs for OnePlus OTA fir
 
 - **Payload Extraction**: [otaripper](https://github.com/syedinsaf/otaripper) by syedinsaf
 - **Playback & Validation**: [payload-dumper-go](https://github.com/ssut/payload-dumper-go) by ssut
-- **ARB Extraction**: [arbextract](https://github.com/koaaN/arbextract) by koaaN
+- **ARB Extraction**: [arb_inspector_next](https://github.com/Dere-Identity/arb_inspector_next) by Dere
 - **API for CN variants**: [roms.danielspringer.at](https://roms.danielspringer.at/) by Daniel Springer
 - **Firmware API**: [Oxygen Updater](https://play.google.com/store/apps/details?id=com.arjanvlek.oxygenupdater)
 

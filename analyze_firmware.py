@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Analyze firmware zip to extract ARB index.
-Wraps payload-dumper-go and arbextract usage.
+Wraps payload-dumper-go and arb_inspector usage.
 """
 
 import shlex
@@ -74,10 +74,10 @@ def analyze_firmware(zip_path, tools_dir, output_dir, final_dir=None):
     tools_dir = Path(tools_dir).resolve()
     output_dir = Path(output_dir).resolve()
     final_dir = Path(final_dir).resolve() if final_dir else Path("firmware_data").resolve()
-    
+
     otaripper = tools_dir / "otaripper"
-    arbextract = tools_dir / "arbextract"
-    
+    arb_inspector = tools_dir / "arb_inspector"
+
     final_img = final_dir / "xbl_config.img"
     
     # 0. Extract basic metadata (always try even if cache hit)
@@ -138,30 +138,62 @@ def analyze_firmware(zip_path, tools_dir, output_dir, final_dir=None):
         # Cleanup temp extraction
         shutil.rmtree(output_dir)
     
-    # 3. Run arbextract on the FINAL file
-    cmd_arb = [str(arbextract), str(final_img)]
+    # 3. Run arb_inspector on the FINAL file with --full mode
+    cmd_arb = [str(arb_inspector), "--full", str(final_img)]
     output = run_command(cmd_arb)
     if not output:
         return None
-        
+
     # 4. Parse Output
-    # Expected output format from arbextract:
-    # ARB (Anti-Rollback): 1
-    # Major Version: 3
-    # Minor Version: 0
-    
+    # Expected output format from arb_inspector --full mode:
+    # File: firmware_data/xbl_config.img
+    # Format: ELF (64-bit)
+    # ...
+    # OEM Metadata:
+    #   Version: X.Y                  <-- OEM metadata version (major.minor)
+    #   Anti-Rollback Version: N      <-- ARB index
+    #   ...
+    # Anti-Rollback Version: N        <-- Repeated at the end
+
     result = {}
+    
+    # Parse all lines
     for line in output.splitlines():
-        if "ARB (Anti-Rollback)" in line:
-            result['arb_index'] = line.split(':')[-1].strip()
-        elif "Major Version" in line:
-            result['major'] = line.split(':')[-1].strip()
-        elif "Minor Version" in line:
-            result['minor'] = line.split(':')[-1].strip()
-            
+        stripped = line.strip()
+        
+        # Parse ARB version (can appear in OEM Metadata section or at the end)
+        if "Anti-Rollback Version:" in line:
+            result['arb_index'] = stripped.split(':')[-1].strip()
+        
+        # Parse OEM Metadata Version: X.Y (this is the major.minor version)
+        if "OEM Metadata:" in line:
+            # Next line should be Version: X.Y
+            continue
+    
+    # Second pass: find Version under OEM Metadata
+    lines = output.splitlines()
+    for i, line in enumerate(lines):
+        if "OEM Metadata:" in line and i + 1 < len(lines):
+            next_line = lines[i + 1].strip()
+            if next_line.startswith("Version:"):
+                version_str = next_line.split(':')[-1].strip()
+                if '.' in version_str:
+                    parts = version_str.split('.')
+                    if len(parts) == 2:
+                        try:
+                            result['major'] = parts[0]
+                            result['minor'] = parts[1]
+                        except:
+                            pass
+                break
+    
     if 'arb_index' not in result:
-        logger.error("Could not parse ARB index from arbextract output")
+        logger.error("Could not parse ARB index from arb_inspector output")
         return None
+    
+    # Set defaults if not found
+    result.setdefault('major', '0')
+    result.setdefault('minor', '0')
         
     # Append metadata
     if metadata:
@@ -175,7 +207,7 @@ def analyze_firmware(zip_path, tools_dir, output_dir, final_dir=None):
 def main():
     parser = argparse.ArgumentParser(description="Analyze firmware ARB index.")
     parser.add_argument("zip_path", help="Path to firmware.zip")
-    parser.add_argument("--tools-dir", default="tools", help="Directory containing payload-dumper and arbextract")
+    parser.add_argument("--tools-dir", default="tools", help="Directory containing payload-dumper-go and arb_inspector")
     parser.add_argument("--output-dir", default="extracted", help="Directory for extraction")
     parser.add_argument("--final-dir", default="firmware_data", help="Directory for final xbl_config.img")
     parser.add_argument("--json", action="store_true", help="Output result as JSON")
