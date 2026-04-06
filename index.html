@@ -995,15 +995,20 @@
             let db;
 
             try {
+                // Try local first
                 const res = await fetch('./database.json');
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                if (!res.ok) throw new Error();
                 db = await res.json();
-                console.log('Database loaded, entries:', Object.keys(db).length);
-            } catch (e) {
-                console.error('Failed to load database:', e);
-                const t = translations[currentLang];
-                grid.innerHTML = `<div style="color:var(--danger); text-align:center; padding: 40px; grid-column: 1/-1;">${t.load_failed}</div>`;
-                return;
+            } catch (e1) {
+                try {
+                    // Fallback to prod URL
+                    const res = await fetch('https://oparb.pages.dev/database.json');
+                    db = await res.json();
+                } catch (e2) {
+                    const t = translations[currentLang];
+                    grid.innerHTML = `<div style="color:var(--danger); text-align:center; padding: 40px; grid-column: 1/-1;">${t.load_failed}</div>`;
+                    return;
+                }
             }
 
             // Process db into devices array
