@@ -1718,6 +1718,19 @@
     "device_name": "OnePlus Nord CE 4 Lite",
     "device_order": 26,
     "versions": {
+      "CPH2621_16.0.5.700(EX01)": {
+        "arb": 0,
+        "major": 0,
+        "minor": 120,
+        "md5": "d4998f61e82317c5843c8d95b95f5a3a",
+        "first_seen": "2026-04-14",
+        "last_checked": "2026-04-14",
+        "status": "current",
+        "is_hardcoded": true,
+        "regions": [
+          "EU"
+        ]
+      },
       "CPH2621_16.0.1.303(EX01)": {
         "arb": 0,
         "major": 0,
@@ -1725,7 +1738,7 @@
         "md5": "7f747226ec77f81583f012f71a24a974",
         "first_seen": "2026-03-18",
         "last_checked": "2026-04-05",
-        "status": "current",
+        "status": "archived",
         "is_hardcoded": true,
         "regions": [
           "EU",
@@ -1854,6 +1867,19 @@
     "device_name": "OnePlus 13",
     "device_order": 2,
     "versions": {
+      "CPH2649_16.0.5.703(EX01)": {
+        "arb": 1,
+        "major": 3,
+        "minor": 0,
+        "md5": "0efa2594bf5466c84bafd4e19073d95e",
+        "first_seen": "2026-04-14",
+        "last_checked": "2026-04-14",
+        "status": "current",
+        "is_hardcoded": false,
+        "regions": [
+          "IN"
+        ]
+      },
       "CPH2649_16.0.5.701(EX01)": {
         "arb": 1,
         "major": 3,
@@ -1861,7 +1887,7 @@
         "md5": "6998133c921d754bf06e693455aabcdc",
         "first_seen": "2026-03-16",
         "last_checked": "2026-04-06",
-        "status": "current",
+        "status": "archived",
         "is_hardcoded": false,
         "regions": [
           "IN"
@@ -4715,6 +4741,19 @@
     "device_name": "OnePlus Ace 6",
     "device_order": 36,
     "versions": {
+      "PLQ110_16.0.5.702(CN01)": {
+        "arb": 1,
+        "major": 3,
+        "minor": 0,
+        "md5": "46eeabc74d38321151cb824c32dab035",
+        "first_seen": "2026-04-14",
+        "last_checked": "2026-04-14",
+        "status": "current",
+        "is_hardcoded": false,
+        "regions": [
+          "CN"
+        ]
+      },
       "PLQ110_16.0.5.701(CN01)": {
         "arb": 1,
         "major": 3,
@@ -4722,7 +4761,7 @@
         "md5": "4b24d6fdc2e5d35a304a5eaaaea57def",
         "first_seen": "2026-04-09",
         "last_checked": "2026-04-09",
-        "status": "current",
+        "status": "archived",
         "is_hardcoded": false,
         "regions": [
           "CN"
