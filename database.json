@@ -1742,7 +1742,8 @@
         "status": "current",
         "is_hardcoded": true,
         "regions": [
-          "EU"
+          "EU",
+          "GLO"
         ]
       },
       "CPH2621_16.0.1.303(EX01)": {
