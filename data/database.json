@@ -2710,6 +2710,19 @@
     "device_name": "OnePlus 15",
     "device_order": 0,
     "versions": {
+      "CPH2745_16.0.7.201(EX01)": {
+        "arb": 0,
+        "major": 3,
+        "minor": 0,
+        "md5": "5fb43a8766343df4f0a378535673a931",
+        "first_seen": "2026-05-10",
+        "last_checked": "2026-05-10",
+        "status": "current",
+        "is_hardcoded": false,
+        "regions": [
+          "IN"
+        ]
+      },
       "CPH2745_16.0.5.703(EX01)": {
         "arb": 0,
         "major": 3,
@@ -2717,7 +2730,7 @@
         "md5": "0318988062a72a31d0095e7cc9cff92a",
         "first_seen": "2026-04-21",
         "last_checked": "2026-04-21",
-        "status": "current",
+        "status": "archived",
         "is_hardcoded": false,
         "regions": [
           "IN"
