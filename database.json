@@ -4343,6 +4343,19 @@
     "device_name": "OnePlus 13",
     "device_order": 2,
     "versions": {
+      "PJZ110_16.0.7.201(CN01)": {
+        "arb": 1,
+        "major": 3,
+        "minor": 0,
+        "md5": "afc5eb1ec721995687d4f27833d0f8e0",
+        "first_seen": "2026-05-12",
+        "last_checked": "2026-05-12",
+        "status": "current",
+        "is_hardcoded": false,
+        "regions": [
+          "CN"
+        ]
+      },
       "PJZ110_16.0.5.703(CN01)": {
         "arb": 1,
         "major": 3,
@@ -4350,7 +4363,7 @@
         "md5": "2cc8031b2589dd4e80bd3c93326c7c7e",
         "first_seen": "2026-04-15",
         "last_checked": "2026-04-15",
-        "status": "current",
+        "status": "archived",
         "is_hardcoded": false,
         "regions": [
           "CN"
@@ -4789,6 +4802,19 @@
     "device_name": "OnePlus 13T",
     "device_order": 4,
     "versions": {
+      "PKX110_16.0.7.200(CN01)": {
+        "arb": 1,
+        "major": 3,
+        "minor": 0,
+        "md5": "3f0a11f9d7b23d4646a345921919a719",
+        "first_seen": "2026-05-12",
+        "last_checked": "2026-05-12",
+        "status": "current",
+        "is_hardcoded": false,
+        "regions": [
+          "CN"
+        ]
+      },
       "PKX110_16.0.5.701(CN01)": {
         "arb": 1,
         "major": 3,
@@ -4796,7 +4822,7 @@
         "md5": "77e2399108c694805d711231570bc2dc",
         "first_seen": "2026-03-11",
         "last_checked": "2026-04-06",
-        "status": "current",
+        "status": "archived",
         "is_hardcoded": false,
         "regions": [
           "CN"
