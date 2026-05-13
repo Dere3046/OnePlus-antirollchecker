@@ -1644,6 +1644,19 @@
     "device_name": "OnePlus 12R",
     "device_order": 8,
     "versions": {
+      "CPH2585_16.0.5.702(EX01)": {
+        "arb": 0,
+        "major": 2,
+        "minor": 0,
+        "md5": "bf4e0cccac0d0a2298689a1e5ce22dcf",
+        "first_seen": "2026-05-13",
+        "last_checked": "2026-05-13",
+        "status": "current",
+        "is_hardcoded": false,
+        "regions": [
+          "IN"
+        ]
+      },
       "CPH2585_16.0.5.701(EX01)": {
         "arb": 0,
         "major": 2,
@@ -1651,7 +1664,7 @@
         "md5": "7fd4af4985f528027f5194c152243172",
         "first_seen": "2026-04-15",
         "last_checked": "2026-04-15",
-        "status": "current",
+        "status": "archived",
         "is_hardcoded": false,
         "regions": [
           "IN"
